@@ -17,7 +17,7 @@ const AvailableItems = ({ onAddItem, items }: Props) => {
         items.map(item => (
           <Card>
             <Card.Content>
-              <Image floated="right" src={`/items/${item.name.toLowerCase()}.svg`} style={{ height: 80, marginBottom: 0 }} />
+              <Image floated="right" src={item.imageSrc} style={{ height: 80, marginBottom: 0 }} />
               <Card.Header>{item.name}</Card.Header>
               <Card.Meta data-testid={`${item.name.toLowerCase()}-price`}>{item.description}</Card.Meta>
             </Card.Content>

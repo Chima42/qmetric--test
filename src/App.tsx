@@ -10,6 +10,7 @@ const App = () => {
   const [items, updateItems] = useState<ItemProps[]>([
     {
       name: "Beans",
+      imageSrc: "/images/beans.svg",
       amount: 0,
       description: "50p each",
       discounted: true,
@@ -19,6 +20,7 @@ const App = () => {
     },
     {
       name: "Eggs",
+      imageSrc: "/images/eggs.svg",
       amount: 0,
       discounted: false,
       id: generateItemId(),
@@ -27,6 +29,7 @@ const App = () => {
     },
     {
       name: "Cola",
+      imageSrc: "/images/cola.svg",
       discounted: true,
       amount: 0,
       id: generateItemId(),
@@ -36,6 +39,7 @@ const App = () => {
     },
     {
       name: "Milk",
+      imageSrc: "/images/milk.svg",
       discounted: false,
       amount: 0,
       id: generateItemId(),
@@ -45,6 +49,7 @@ const App = () => {
     {
       name: "Pizza",
       discounted: true,
+      imageSrc: "/images/pizza.svg",
       amount: 0,
       id: generateItemId(),
       description: "£2.20",
@@ -53,6 +58,7 @@ const App = () => {
     },
     {
       name: "Tea",
+      imageSrc: "/images/tea.svg",
       discounted: false,
       amount: 0,
       id: generateItemId(),
@@ -62,6 +68,7 @@ const App = () => {
     {
       name: "Cereal",
       discounted: false,
+      imageSrc: "/images/cereal.svg",
       id: generateItemId(),
       amount: 0,
       description: "£1.40",
@@ -69,6 +76,7 @@ const App = () => {
     },
     {
       name: "Bananas",
+      imageSrc: "/images/bananas.svg",
       amount: 0,
       id: generateItemId(),
       discounted: false,
@@ -78,6 +86,7 @@ const App = () => {
     {
       name: "Lemons",
       discounted: false,
+      imageSrc: "/images/lemons.svg",
       amount: 0,
       id: generateItemId(),
       description: "£1.40/kg",
@@ -86,6 +95,7 @@ const App = () => {
     {
       name: "Oranges",
       discounted: false,
+      imageSrc: "/images/oranges.svg",
       amount: 0,
       id: generateItemId(),
       description: "£1.99/kg",
@@ -101,10 +111,6 @@ const App = () => {
 
   function generateItemId() {
     return Math.floor(Math.random() * (9999 - 1000) + 1000);
-  }
-
-  const onItemSelect = () => {
-
   }
 
   return (
@@ -142,11 +148,17 @@ const App = () => {
           ) : (
             <>
               <CartItems
-                cart={cart}
-                onSetItem={(itemId, quantity) => setCart({ ...cart, [itemId]: quantity })}
+                items={items.filter(item => item.amount !== 0)}
+                onRemove={(id: number) => {
+                  updateItems(items.map(item => {
+                    if (id === item.id)
+                      item.amount = item.amount - 1;
+                    return item;
+                  }))
+                }}
               />
 
-              <CartTotal cart={cart} />
+              <CartTotal tems={tems} />
             </>
           )}
         </Grid.Column>

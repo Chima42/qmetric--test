@@ -1,61 +1,63 @@
 import _ from "lodash";
 import { Image, List, Button } from "semantic-ui-react";
+import { ItemProps } from "./types/Item";
 
 type CartItemProps = {
-  name: string;
-  description: string;
-  imageSrc: string;
-  onRemove: () => void;
+  item: ItemProps;
+  onRemove: (id: number) => number;
 };
 
-const CartItem = ({ name, description, imageSrc, onRemove }: CartItemProps) => (
-  <List.Item>
-    <Image src={imageSrc} size="mini" style={{ height: 50 }} />
-    <List.Content>
-      <List.Header>{name}</List.Header>
-      <List.Description>{description}</List.Description>
-    </List.Content>
-    <List.Content floated="right" verticalAlign="bottom">
-      <Button title={`Remove ${name}`} icon="trash" onClick={onRemove} />
-    </List.Content>
-  </List.Item>
-);
+
+const getKGDescription = (amountOfItem: number, value: number, itemInfo: string) => {
+  return `£${((value * amountOfItem) / 100).toFixed(2)} (${amountOfItem}${itemInfo})`;
+}
+
+const CartItem = ({ item, onRemove }: CartItemProps) => {
+  const {name, imageSrc, description, id} = item;
+  
+};
 
 type CartItemsProps = {
-  cart: { [itemId: string]: number };
-  onSetItem: (itemId: string, quantity: number) => void;
+  items: ItemProps[];
+  onRemove: (id: number) => void;
 };
 
-const CartItems = ({ cart: { beans, eggs, oranges }, onSetItem }: CartItemsProps) => (
+const CartItems = ({ items, onRemove }: CartItemsProps) => (
   <List divided relaxed>
-    {_.range(beans || 0).map((i) => (
-      <CartItem
-        key={i}
-        name="Beans"
-        imageSrc="/items/beans.svg"
-        description="£0.50"
-        onRemove={() => onSetItem("beans", beans - 1)}
-      />
-    ))}
+    {
+      items.map((item) => {
+        const {name, imageSrc, description, id, amount, weightType} = item;
+        return _.range(amount || 0).map(() => (
+          // <CartItem
+          //   key={id}
+          //   name={name}
+          //   imageSrc={imageSrc}
+          //   description={weightType === "variable" ? getKGDescription(amount, 199, "kg @ £1.99/kg") : description}
+          //   onRemove={onRemove(id)}
+          // />
 
-    {_.range(eggs || 0).map((i) => (
-      <CartItem
-        key={i}
-        name="Eggs"
-        imageSrc="/items/eggs.svg"
-        description="£2.95 (dozen)"
-        onRemove={() => onSetItem("eggs", eggs - 1)}
-      />
-    ))}
+          <List.Item>
+            <Image src={imageSrc} size="mini" style={{ height: 50 }} />
+            <List.Content>
+              <List.Header>{name}</List.Header>
+              <List.Description>{description}</List.Description>
+            </List.Content>
+            <List.Content floated="right" verticalAlign="bottom">
+              <Button title={`Remove ${name}`} icon="trash" onClick={() => onRemove(id)} />
+            </List.Content>
+          </List.Item>
+        ))
+      })
+    }
 
-    {!!oranges && (
-      <CartItem
-        name="Oranges"
-        imageSrc="/items/oranges.svg"
-        description={`£${((199 * oranges) / 100).toFixed(2)} (${oranges}kg @ £1.99/kg)`}
-        onRemove={() => onSetItem("oranges", oranges - 1)}
-      />
-    )}
+    {/* // {!!oranges && (
+    //   <CartItem
+    //     name="Oranges"
+    //     imageSrc="/items/oranges.svg"
+    //     description={`£${((199 * oranges) / 100).toFixed(2)} (${oranges}kg @ £1.99/kg)`}
+    //     onRemove={() => onSetItem("oranges", oranges - 1)}
+    //   />
+    // )} */}
   </List>
 );
 
