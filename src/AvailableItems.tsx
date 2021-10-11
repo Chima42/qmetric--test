@@ -1,25 +1,34 @@
-import { useState } from "react";
 import { Button, Card, Form, Image, Input } from "semantic-ui-react";
-import { ItemProps } from "./types/Item";
+import { AvailableItemProps } from "./types/Item";
 
 type Props = {
-  onAddItem: (item: ItemProps) => void;
-  items: ItemProps[]
+  onAddItem: (item: AvailableItemProps) => void;
+  items: AvailableItemProps[]
+  formatPriceAndDescription: (item: AvailableItemProps) => string
 };
 
-const AvailableItems = ({ onAddItem, items }: Props) => {
-  const [weight, setWeight] = useState("");
-  const isValid = !!(weight && parseFloat(weight) && parseFloat(weight) > 0);
+const AvailableItems = ({ onAddItem, items, formatPriceAndDescription }: Props) => {
+  // const [weight, setWeight] = useState("");
+  // const isValid = !!(weight && parseFloat(weight) && parseFloat(weight) > 0);
+
+  const setItemWeight = (value: String, itemId: number) => {
+    items = items.map(x => {
+      x.weightAdded = x.id === itemId ? Number(value) : x.weightAdded
+      return x;
+    })
+  }
 
   return (
     <Card.Group centered>
       {
         items.map(item => (
-          <Card>
+          <Card key={item.id}>
             <Card.Content>
               <Image floated="right" src={item.imageSrc} style={{ height: 80, marginBottom: 0 }} />
               <Card.Header>{item.name}</Card.Header>
-              <Card.Meta data-testid={`${item.name.toLowerCase()}-price`}>{item.description}</Card.Meta>
+              <Card.Meta data-testid={`${item.name.toLowerCase()}-price`}>
+                {formatPriceAndDescription(item)}
+              </Card.Meta>
             </Card.Content>
 
             {
@@ -31,15 +40,15 @@ const AvailableItems = ({ onAddItem, items }: Props) => {
             }
 
             {
-              item.weightType === "variable" &&
+              item.weightType === "variable" ?
               <Card.Content style={{ flexGrow: 0 }}>
                 <Form>
                   <Form.Group>
                     <Form.Field>
                       <label>Weight</label>
                       <Input
-                        value={weight}
-                        onChange={(e) => setWeight(e.currentTarget.value)}
+                        value={item.weightAdded}
+                        onChange={(e) => setItemWeight(e.currentTarget.value, item.id)}
                         size="small"
                         label={{ basic: true, content: "kg" }}
                         labelPosition="right"
@@ -49,34 +58,25 @@ const AvailableItems = ({ onAddItem, items }: Props) => {
                   </Form.Group>
 
                   <Form.Field>
-                    <Button onClick={() => onAddItem(item)} disabled={!isValid}>
+                    <Button onClick={() => onAddItem(item)} disabled={((item.weightAdded !== undefined) && (item.weightAdded > 0))}>
                       Add {item.name}
                     </Button>
                   </Form.Field>
                 </Form>
-              </Card.Content>
-            }
-
-            <Card.Content style={{ flexGrow: 0 }}>
+              </Card.Content> :
+              <Card.Content style={{ flexGrow: 0 }}>
               <Form>
                 <Form.Field>
-                  <Button onClick={() => onAddItem(item)}>Add Beans</Button>
+                  <Button onClick={() => onAddItem(item)}>Add {item.name}</Button>
                 </Form.Field>
               </Form>
             </Card.Content>
+            }
+
+
           </Card>
         ))
       }
-
-      <Card>
-        <Card.Content>
-          <Image floated="right" src="/items/oranges.svg" style={{ height: 80, marginBottom: 0 }} />
-          <Card.Header>Oranges</Card.Header>
-          <Card.Meta data-testid="oranges-price">£1.99/kg</Card.Meta>
-        </Card.Content>
-
-
-      </Card>
     </Card.Group>
   );
 };

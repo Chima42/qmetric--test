@@ -4,113 +4,144 @@ import { Grid, Header, Message } from "semantic-ui-react";
 import AvailableItems from "./AvailableItems";
 import CartItems from "./CartItems";
 import CartTotal from "./CartTotal";
-import { ItemProps } from "./types/Item";
+import { AvailableItemProps } from "./types/Item";
 
 const App = () => {
-  const [items, updateItems] = useState<ItemProps[]>([
+  const [items, updateItems] = useState<AvailableItemProps[]>([
     {
       name: "Beans",
-      imageSrc: "/images/beans.svg",
-      amount: 0,
-      description: "50p each",
+      imageSrc: "/items/beans.svg",
+      totalAddedToCart: 0,
+      price: 0.50,
+      description: "each",
       discounted: true,
       id: generateItemId(),
+      savings: 0,
       weightType: "fixed",
       discount: "Three tins for the price of two"
     },
     {
       name: "Eggs",
-      imageSrc: "/images/eggs.svg",
-      amount: 0,
+      imageSrc: "/items/eggs.svg",
+      totalAddedToCart: 0,
       discounted: false,
+      price: 2.90,
       id: generateItemId(),
-      description: "£2.90 per dozen",
+      savings: 0,
+      description: "per dozen",
       weightType: "fixed"
     },
     {
       name: "Cola",
-      imageSrc: "/images/cola.svg",
+      imageSrc: "/items/cola.svg",
       discounted: true,
-      amount: 0,
+      totalAddedToCart: 0,
+      price: 0.70,
       id: generateItemId(),
-      description: "70p",
+      savings: 0,
+      description: "each",
       weightType: "fixed",
       discount: "Two cans for £1"
     },
     {
       name: "Milk",
-      imageSrc: "/images/milk.svg",
+      imageSrc: "/items/milk.svg",
       discounted: false,
-      amount: 0,
+      totalAddedToCart: 0,
+      price: 0.55,
       id: generateItemId(),
-      description: "55p (1 pint)",
+      savings: 0,
+      description: "(1 pint)",
       weightType: "fixed"
     },
     {
       name: "Pizza",
       discounted: true,
-      imageSrc: "/images/pizza.svg",
-      amount: 0,
+      imageSrc: "/items/pizza.svg",
+      totalAddedToCart: 0,
+      price: 2.20,
       id: generateItemId(),
-      description: "£2.20",
+      savings: 0,
+      description: "each",
       weightType: "fixed",
       discount: "Three for £6"
     },
     {
       name: "Tea",
-      imageSrc: "/images/tea.svg",
+      imageSrc: "/items/tea.svg",
       discounted: false,
-      amount: 0,
+      totalAddedToCart: 0,
+      price: 2.50,
       id: generateItemId(),
-      description: "£2.50 (80 bags)",
+      savings: 0,
+      description: "(80 bags)",
       weightType: "fixed"
     },
     {
       name: "Cereal",
       discounted: false,
-      imageSrc: "/images/cereal.svg",
+      imageSrc: "/items/cereal.svg",
       id: generateItemId(),
-      amount: 0,
-      description: "£1.40",
+      savings: 0,
+      totalAddedToCart: 0,
+      price: 1.40,
+      description: "each",
       weightType: "fixed"
     },
     {
       name: "Bananas",
-      imageSrc: "/images/bananas.svg",
-      amount: 0,
+      imageSrc: "/items/bananas.svg",
+      totalAddedToCart: 0,
+      price: 0.85,
       id: generateItemId(),
+      savings: 0,
       discounted: false,
-      description: "85p/kg",
+      description: "/kg",
       weightType: "variable"
     },
     {
       name: "Lemons",
       discounted: false,
-      imageSrc: "/images/lemons.svg",
-      amount: 0,
+      imageSrc: "/items/lemons.svg",
+      totalAddedToCart: 0,
+      price: 1.40,
       id: generateItemId(),
-      description: "£1.40/kg",
+      savings: 0,
+      description: "/kg",
       weightType: "variable"
     },
     {
       name: "Oranges",
       discounted: false,
-      imageSrc: "/images/oranges.svg",
-      amount: 0,
+      imageSrc: "/items/oranges.svg",
+      totalAddedToCart: 0,
+      price: 1.99,
       id: generateItemId(),
-      description: "£1.99/kg",
+      savings: 0,
+      description: "/kg",
       weightType: "variable"
     }
   ]);
 
-  const [cart, updateCart] = useState<ItemProps[]>([]);
-
   const isCartEmpty = () => {
-    return items.every(item => item.amount === 0);
+    return items.every(item => item.totalAddedToCart === 0);
   }
 
   function generateItemId() {
     return Math.floor(Math.random() * (9999 - 1000) + 1000);
+  }
+
+  const formatPriceAndDescription = (item: AvailableItemProps) => {
+    const { price, description, weightType} = item;
+    if (price < 1) {
+      if (weightType === "variable")
+        return `${price.toFixed(2).replace(/^0./, "")}p${description}`;
+      return `${price.toFixed(2).replace(/^0./, "")}p ${description}`;
+    }
+    if (weightType === "variable")
+      return `£${price.toFixed(2)}${description}`
+    else 
+      return `£${price.toFixed(2)} ${description}`
   }
 
   return (
@@ -124,11 +155,14 @@ const App = () => {
       <Grid.Row>
         <Grid.Column width={10}>
           <AvailableItems
+            formatPriceAndDescription={formatPriceAndDescription}
             onAddItem={(selectedItem) => {
               updateItems(
                 items.map(item => {
-                  if (item.id === selectedItem.id)
-                    item.amount = item.amount + 1;
+                  if (item.id === selectedItem.id) {
+                    item.weightAdded = selectedItem.weightAdded;
+                    item.totalAddedToCart = item.totalAddedToCart + 1;
+                  }
                   return item;
                 })
               )
@@ -148,17 +182,18 @@ const App = () => {
           ) : (
             <>
               <CartItems
-                items={items.filter(item => item.amount !== 0)}
+                items={items.filter(item => item.totalAddedToCart !== 0)}
+                formatPriceAndDescription={formatPriceAndDescription}
                 onRemove={(id: number) => {
                   updateItems(items.map(item => {
                     if (id === item.id)
-                      item.amount = item.amount - 1;
+                      item.totalAddedToCart = item.totalAddedToCart - 1;
                     return item;
                   }))
                 }}
               />
 
-              <CartTotal tems={tems} />
+              <CartTotal items={items.filter(item => item.totalAddedToCart !== 0)} />
             </>
           )}
         </Grid.Column>

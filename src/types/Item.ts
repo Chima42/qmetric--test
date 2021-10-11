@@ -1,12 +1,16 @@
 type ItemWeightType = "variable" | "fixed"
 
-export type ItemProps = {
+export type AvailableItemProps = {
   name: string;
-  amount: number;
+  totalAddedToCart: number;
+  price: number;
   id: number;
   imageSrc: string;
   description: string;
   discounted: boolean;
   discount?: string;
   weightType: ItemWeightType;
+  weightAdded?: number;
+  cartId?: string;
+  savings: number;
 }
