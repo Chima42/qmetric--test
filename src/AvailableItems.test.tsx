@@ -1,10 +1,16 @@
 import _ from "lodash";
 import { render, fireEvent, screen } from "@testing-library/react";
 
+import { AvailableItemProps } from "./types/Item";
 import AvailableItems from "./AvailableItems";
+import { data } from "./AvailableItemDataMock";
 
-const props = {
+const props: {
+  onAddItem: () => void,
+  items: AvailableItemProps[]
+} = {
   onAddItem: _.noop,
+  items: data
 };
 
 it("displays the available items", () => {
