@@ -3,7 +3,7 @@ import { AvailableItemProps } from "./types/Item";
 export const data: AvailableItemProps[] = [
   {
     name: "Beans",
-    imageSrc: "/images/beans.svg",
+    imageSrc: "/items/beans.svg",
     totalAddedToCart: 0,
     price: 0.50,
     description: "each",
@@ -11,11 +11,12 @@ export const data: AvailableItemProps[] = [
     id: generateItemId(),
     savings: 0,
     weightType: "fixed",
-    discount: "Three tins for the price of two"
-  },
+    discountLabel: "Three tins for the price of two",
+    discount: () => 3 % 2
+   },
   {
     name: "Eggs",
-    imageSrc: "/images/eggs.svg",
+    imageSrc: "/items/eggs.svg",
     totalAddedToCart: 0,
     discounted: false,
     price: 2.90,
@@ -26,7 +27,7 @@ export const data: AvailableItemProps[] = [
   },
   {
     name: "Cola",
-    imageSrc: "/images/cola.svg",
+    imageSrc: "/items/cola.svg",
     discounted: true,
     totalAddedToCart: 0,
     price: 0.70,
@@ -34,11 +35,11 @@ export const data: AvailableItemProps[] = [
     savings: 0,
     description: "each",
     weightType: "fixed",
-    discount: "Two cans for £1"
+    discountLabel: "Two cans for £1"
   },
   {
     name: "Milk",
-    imageSrc: "/images/milk.svg",
+    imageSrc: "/items/milk.svg",
     discounted: false,
     totalAddedToCart: 0,
     price: 0.55,
@@ -50,18 +51,18 @@ export const data: AvailableItemProps[] = [
   {
     name: "Pizza",
     discounted: true,
-    imageSrc: "/images/pizza.svg",
+    imageSrc: "/items/pizza.svg",
     totalAddedToCart: 0,
     price: 2.20,
     id: generateItemId(),
     savings: 0,
     description: "each",
     weightType: "fixed",
-    discount: "Three for £6"
+    discountLabel: "Three for £6"
   },
   {
     name: "Tea",
-    imageSrc: "/images/tea.svg",
+    imageSrc: "/items/tea.svg",
     discounted: false,
     totalAddedToCart: 0,
     price: 2.50,
@@ -73,7 +74,7 @@ export const data: AvailableItemProps[] = [
   {
     name: "Cereal",
     discounted: false,
-    imageSrc: "/images/cereal.svg",
+    imageSrc: "/items/cereal.svg",
     id: generateItemId(),
     savings: 0,
     totalAddedToCart: 0,
@@ -83,7 +84,7 @@ export const data: AvailableItemProps[] = [
   },
   {
     name: "Bananas",
-    imageSrc: "/images/bananas.svg",
+    imageSrc: "/items/bananas.svg",
     totalAddedToCart: 0,
     price: 0.85,
     id: generateItemId(),
@@ -95,7 +96,7 @@ export const data: AvailableItemProps[] = [
   {
     name: "Lemons",
     discounted: false,
-    imageSrc: "/images/lemons.svg",
+    imageSrc: "/items/lemons.svg",
     totalAddedToCart: 0,
     price: 1.40,
     id: generateItemId(),
@@ -106,7 +107,7 @@ export const data: AvailableItemProps[] = [
   {
     name: "Oranges",
     discounted: false,
-    imageSrc: "/images/oranges.svg",
+    imageSrc: "/items/oranges.svg",
     totalAddedToCart: 0,
     price: 1.99,
     id: generateItemId(),

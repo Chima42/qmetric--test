@@ -18,7 +18,8 @@ const App = () => {
       id: generateItemId(),
       savings: 0,
       weightType: "fixed",
-      discount: "Three tins for the price of two"
+      discountLabel: "Three tins for the price of two",
+      discount: (addedToCart: number, price: number) => Math.floor(addedToCart / 3) * price
     },
     {
       name: "Eggs",
@@ -41,7 +42,7 @@ const App = () => {
       savings: 0,
       description: "each",
       weightType: "fixed",
-      discount: "Two cans for £1"
+      discountLabel: "Two cans for £1"
     },
     {
       name: "Milk",
@@ -64,7 +65,7 @@ const App = () => {
       savings: 0,
       description: "each",
       weightType: "fixed",
-      discount: "Three for £6"
+      discountLabel: "Three for £6"
     },
     {
       name: "Tea",

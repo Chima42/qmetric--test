@@ -8,7 +8,8 @@ export type AvailableItemProps = {
   imageSrc: string;
   description: string;
   discounted: boolean;
-  discount?: string;
+  discountLabel?: string;
+  discount?: (addedToCart: number, price: number) => number;
   weightType: ItemWeightType;
   weightAdded?: number;
   cartId?: string;

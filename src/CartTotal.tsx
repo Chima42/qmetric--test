@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { useEffect, useState } from "react";
 import { List, Header } from "semantic-ui-react";
 import { AvailableItemProps } from "./types/Item";
 
@@ -21,13 +22,20 @@ type CartTotalProps = {
 };
 
 const CartTotal = ({ items }: CartTotalProps) => {
-  const subtotal = items.map(item => item.price * item.totalAddedToCart).reduce((previousPrice, currentPrice) => previousPrice + currentPrice);
-  const discountedItems = items.filter(item => item.discounted);
-  discountedItems.forEach(item => {
-    item.savings = Math.round(item.totalAddedToCart / 3) * item.price
-  });
-  const totalSavings = discountedItems.reduce((a,b) => a + b.savings, 0);
+  const [subtotal, updateSubtotal] = useState(0);
+  const [discountedItems, updateDiscountedItems] = useState<AvailableItemProps[]>([]);
+  const [totalSavings, updateTotalSavings] = useState(0);
 
+  useEffect(() => {
+    updateSubtotal(items.map(item => item.price * item.totalAddedToCart).reduce((previousPrice, currentPrice) => previousPrice + currentPrice));
+    updateDiscountedItems(
+      items.filter(item => item.discounted).map(item => {
+        item.savings = item.discount!(item.totalAddedToCart, item.price);
+        return item;
+      })
+    );
+    updateTotalSavings(discountedItems.reduce((a,b) => a + b.savings, 0));
+  }, [items]);
   
   return (
     <>
@@ -39,18 +47,16 @@ const CartTotal = ({ items }: CartTotalProps) => {
           {
             discountedItems.map(item => {
               return <List divided relaxed>
-                {_.range(Math.floor(item.totalAddedToCart / 3)).map((i) => (
+                {_.range(item.discount!(item.totalAddedToCart, item.price)).map((i) => (
                   <DiscountItem
                     key={i}
-                    description={`${item.name}: ${item.discount}`}
+                    description={`${item.name}: ${item.discountLabel}`}
                     saving={item.savings ? item.savings : 0}
                   />
                 ))}
               </List>
             })
           }
-
-
           <Header as="h3">{`Total Savings: -£${totalSavings.toFixed(2)}`}</Header>
         </>
       )}

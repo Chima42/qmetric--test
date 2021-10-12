@@ -35,7 +35,7 @@ const AvailableItems = ({ onAddItem, items, formatPriceAndDescription }: Props) 
               item.discounted &&
               <Card.Content>
                 <Card.Description>DISCOUNT:</Card.Description>
-                <Card.Description>{item.discount}</Card.Description>
+                <Card.Description>{item.discountLabel}</Card.Description>
               </Card.Content>
             }
 
