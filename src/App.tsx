@@ -4,10 +4,10 @@ import { Grid, Header, Message } from "semantic-ui-react";
 import AvailableItems from "./AvailableItems";
 import CartItems from "./CartItems";
 import CartTotal from "./CartTotal";
-import { AvailableItemProps } from "./types/Item";
+import { IAvailableItemProps, IDiscountedItemProps, IVariableItemProps } from "./types/Item";
 
 const App = () => {
-  const [items, updateItems] = useState<AvailableItemProps[]>([
+  const [items, updateItems] = useState<(IVariableItemProps | IAvailableItemProps | IDiscountedItemProps)[]>([
     {
       name: "Beans",
       imageSrc: "/items/beans.svg",
@@ -16,10 +16,13 @@ const App = () => {
       description: "each",
       discounted: true,
       id: generateItemId(),
-      savings: 0,
+      savingPerItem: 0.50,
+      totalSavings: 0,
       weightType: "fixed",
       discountLabel: "Three tins for the price of two",
-      discount: (addedToCart: number, price: number) => Math.floor(addedToCart / 3) * price
+      discount: (addedToCart: number, multiplier: number, savingPerItem: number) => Math.floor(addedToCart / multiplier) * savingPerItem,
+      cartId: "0",
+      multiplier: 3
     },
     {
       name: "Eggs",
@@ -28,9 +31,12 @@ const App = () => {
       discounted: false,
       price: 2.90,
       id: generateItemId(),
-      savings: 0,
+      savingPerItem: 0,
+      totalSavings: 0,
       description: "per dozen",
-      weightType: "fixed"
+      weightType: "fixed",
+      cartId: "0",
+      multiplier: 1
     },
     {
       name: "Cola",
@@ -38,11 +44,15 @@ const App = () => {
       discounted: true,
       totalAddedToCart: 0,
       price: 0.70,
+      savingPerItem: 0.40,
+      totalSavings: 0,
       id: generateItemId(),
-      savings: 0,
       description: "each",
       weightType: "fixed",
-      discountLabel: "Two cans for £1"
+      discountLabel: "Two cans for £1",
+      discount: (addedToCart: number, multiplier: number, savingPerItem: number) => Math.floor(addedToCart / multiplier) * savingPerItem,
+      cartId: "0",
+      multiplier: 2
     },
     {
       name: "Milk",
@@ -51,9 +61,12 @@ const App = () => {
       totalAddedToCart: 0,
       price: 0.55,
       id: generateItemId(),
-      savings: 0,
+      savingPerItem: 0,
+      totalSavings: 0,
       description: "(1 pint)",
-      weightType: "fixed"
+      weightType: "fixed",
+      cartId: "0",
+      multiplier: 1
     },
     {
       name: "Pizza",
@@ -62,10 +75,14 @@ const App = () => {
       totalAddedToCart: 0,
       price: 2.20,
       id: generateItemId(),
-      savings: 0,
+      savingPerItem: 0.60,
+      totalSavings: 0,
       description: "each",
       weightType: "fixed",
-      discountLabel: "Three for £6"
+      discountLabel: "Three for £6",
+      discount: (addedToCart: number, multiplier: number, savingPerItem: number) => Math.floor(addedToCart / multiplier) * savingPerItem,
+      cartId: "0",
+      multiplier: 3
     },
     {
       name: "Tea",
@@ -74,20 +91,26 @@ const App = () => {
       totalAddedToCart: 0,
       price: 2.50,
       id: generateItemId(),
-      savings: 0,
+      savingPerItem: 0,
+      totalSavings: 0,
       description: "(80 bags)",
-      weightType: "fixed"
+      weightType: "fixed",
+      cartId: "0",
+      multiplier: 1
     },
     {
       name: "Cereal",
       discounted: false,
       imageSrc: "/items/cereal.svg",
       id: generateItemId(),
-      savings: 0,
+      savingPerItem: 0,
+      totalSavings: 0,
       totalAddedToCart: 0,
       price: 1.40,
       description: "each",
-      weightType: "fixed"
+      weightType: "fixed",
+      cartId: "0",
+      multiplier: 1
     },
     {
       name: "Bananas",
@@ -95,10 +118,13 @@ const App = () => {
       totalAddedToCart: 0,
       price: 0.85,
       id: generateItemId(),
-      savings: 0,
+      savingPerItem: 0,
+      totalSavings: 0,
       discounted: false,
       description: "/kg",
-      weightType: "variable"
+      weightType: "variable",
+      cartId: "0",
+      multiplier: 1
     },
     {
       name: "Lemons",
@@ -107,9 +133,12 @@ const App = () => {
       totalAddedToCart: 0,
       price: 1.40,
       id: generateItemId(),
-      savings: 0,
+      savingPerItem: 0,
+      totalSavings: 0,
       description: "/kg",
-      weightType: "variable"
+      weightType: "variable",
+      cartId: "0",
+      multiplier: 1
     },
     {
       name: "Oranges",
@@ -118,9 +147,12 @@ const App = () => {
       totalAddedToCart: 0,
       price: 1.99,
       id: generateItemId(),
-      savings: 0,
+      savingPerItem: 0,
+      totalSavings: 0,
       description: "/kg",
-      weightType: "variable"
+      weightType: "variable",
+      cartId: "0",
+      multiplier: 1
     }
   ]);
 
@@ -132,14 +164,14 @@ const App = () => {
     return Math.floor(Math.random() * (9999 - 1000) + 1000);
   }
 
-  const formatPriceAndDescription = (item: AvailableItemProps) => {
-    const { price, description, weightType} = item;
+  const formatPriceAndDescription = (item: IVariableItemProps | IAvailableItemProps | IDiscountedItemProps) => {
+    const { price, description} = item;
     if (price < 1) {
-      if (weightType === "variable")
+      if ((item as IVariableItemProps).weightType === "variable")
         return `${price.toFixed(2).replace(/^0./, "")}p${description}`;
       return `${price.toFixed(2).replace(/^0./, "")}p ${description}`;
     }
-    if (weightType === "variable")
+    if ((item as IVariableItemProps).weightType === "variable")
       return `£${price.toFixed(2)}${description}`
     else 
       return `£${price.toFixed(2)} ${description}`
@@ -161,7 +193,7 @@ const App = () => {
               updateItems(
                 items.map(item => {
                   if (item.id === selectedItem.id) {
-                    item.weightAdded = selectedItem.weightAdded;
+                    (item as IVariableItemProps).weightAdded = (selectedItem as IVariableItemProps).weightAdded;
                     item.totalAddedToCart = item.totalAddedToCart + 1;
                   }
                   return item;

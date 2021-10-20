@@ -1,10 +1,10 @@
 import _ from "lodash";
 import { Image, List, Button } from "semantic-ui-react";
-import { AvailableItemProps } from "./types/Item";
+import { AvailableItemProps, IAvailableItemProps, IDiscountedItemProps, IVariableItemProps } from "./types/Item";
 
 type CartItemsProps = {
-  items: AvailableItemProps[];
-  formatPriceAndDescription: (item: AvailableItemProps) => string;
+  items: (IVariableItemProps | IAvailableItemProps | IDiscountedItemProps)[];
+  formatPriceAndDescription: (item: IVariableItemProps | IAvailableItemProps | IDiscountedItemProps) => string;
   onRemove: (id: number) => void;
 };
 

@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { List, Header } from "semantic-ui-react";
-import { AvailableItemProps } from "./types/Item";
+import { IAvailableItemProps, IDiscountedItemProps, IVariableItemProps } from "./types/Item";
 
 type DiscountAvailableItemProps = {
   description: string;
@@ -18,23 +18,22 @@ const DiscountItem = ({ description, saving }: DiscountAvailableItemProps) => (
 );
 
 type CartTotalProps = {
-  items: AvailableItemProps[]
+  items: (IVariableItemProps | IAvailableItemProps | IDiscountedItemProps)[]
 };
 
 const CartTotal = ({ items }: CartTotalProps) => {
   const [subtotal, updateSubtotal] = useState(0);
-  const [discountedItems, updateDiscountedItems] = useState<AvailableItemProps[]>([]);
+  const [discountedItems, updateDiscountedItems] = useState<IDiscountedItemProps[]>([]);
   const [totalSavings, updateTotalSavings] = useState(0);
 
   useEffect(() => {
     updateSubtotal(items.map(item => item.price * item.totalAddedToCart).reduce((previousPrice, currentPrice) => previousPrice + currentPrice));
-    updateDiscountedItems(
-      items.filter(item => item.discounted).map(item => {
-        item.savings = item.discount!(item.totalAddedToCart, item.price);
-        return item;
-      })
-    );
-    updateTotalSavings(discountedItems.reduce((a,b) => a + b.savings, 0));
+    const discountedItems = (items.filter(item => item.discounted) as IDiscountedItemProps[]);
+    updateDiscountedItems(discountedItems.map(item => {
+      item.totalSavings = item.discount(item.totalAddedToCart, item.multiplier, item.savingPerItem);
+      return item;
+    }));
+    updateTotalSavings(discountedItems.reduce((a,b) => a + b.totalSavings, 0));
   }, [items]);
   
   return (
@@ -43,15 +42,14 @@ const CartTotal = ({ items }: CartTotalProps) => {
       {totalSavings && (
         <>
           <Header as="h2">Awesome Discounts</Header>
-
           {
             discountedItems.map(item => {
               return <List divided relaxed>
-                {_.range(item.discount!(item.totalAddedToCart, item.price)).map((i) => (
+                {_.range(Math.floor(item.totalAddedToCart / item.multiplier)).map((i) => (
                   <DiscountItem
                     key={i}
                     description={`${item.name}: ${item.discountLabel}`}
-                    saving={item.savings ? item.savings : 0}
+                    saving={item.savingPerItem}
                   />
                 ))}
               </List>

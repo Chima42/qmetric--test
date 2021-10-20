@@ -1,10 +1,10 @@
 import { Button, Card, Form, Image, Input } from "semantic-ui-react";
-import { AvailableItemProps } from "./types/Item";
+import { AvailableItemProps, IAvailableItemProps, IDiscountedItemProps, IVariableItemProps } from "./types/Item";
 
 type Props = {
-  onAddItem: (item: AvailableItemProps) => void;
-  items: AvailableItemProps[]
-  formatPriceAndDescription: (item: AvailableItemProps) => string
+  onAddItem: (item: (IVariableItemProps | IAvailableItemProps | IDiscountedItemProps)) => void;
+  items: (IVariableItemProps | IAvailableItemProps | IDiscountedItemProps)[]
+  formatPriceAndDescription: (item: IVariableItemProps | IAvailableItemProps | IDiscountedItemProps) => string
 };
 
 const AvailableItems = ({ onAddItem, items, formatPriceAndDescription }: Props) => {
@@ -13,7 +13,7 @@ const AvailableItems = ({ onAddItem, items, formatPriceAndDescription }: Props) 
 
   const setItemWeight = (value: String, itemId: number) => {
     items = items.map(x => {
-      x.weightAdded = x.id === itemId ? Number(value) : x.weightAdded
+      (x as IVariableItemProps).weightAdded = x.id === itemId ? Number(value) : (x as IVariableItemProps).weightAdded
       return x;
     })
   }
@@ -32,22 +32,22 @@ const AvailableItems = ({ onAddItem, items, formatPriceAndDescription }: Props) 
             </Card.Content>
 
             {
-              item.discounted &&
-              <Card.Content>
-                <Card.Description>DISCOUNT:</Card.Description>
-                <Card.Description>{item.discountLabel}</Card.Description>
-              </Card.Content>
+              (item as IDiscountedItemProps).discounted &&
+                <Card.Content>
+                  <Card.Description>DISCOUNT:</Card.Description>
+                  <Card.Description>{(item as IDiscountedItemProps).discountLabel}</Card.Description>
+                </Card.Content>
             }
 
             {
-              item.weightType === "variable" ?
+              (item as IVariableItemProps).weightType === "variable" ?
               <Card.Content style={{ flexGrow: 0 }}>
                 <Form>
                   <Form.Group>
                     <Form.Field>
                       <label>Weight</label>
                       <Input
-                        value={item.weightAdded}
+                        value={(item as IVariableItemProps).weightAdded}
                         onChange={(e) => setItemWeight(e.currentTarget.value, item.id)}
                         size="small"
                         label={{ basic: true, content: "kg" }}
@@ -58,7 +58,7 @@ const AvailableItems = ({ onAddItem, items, formatPriceAndDescription }: Props) 
                   </Form.Group>
 
                   <Form.Field>
-                    <Button onClick={() => onAddItem(item)} disabled={((item.weightAdded !== undefined) && (item.weightAdded > 0))}>
+                    <Button onClick={() => onAddItem((item as IVariableItemProps))} disabled={(item as IVariableItemProps).weightAdded > 0}>
                       Add {item.name}
                     </Button>
                   </Form.Field>
